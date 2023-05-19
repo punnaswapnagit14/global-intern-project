@@ -1,27 +1,138 @@
-let input = document.getElementById('inputBox');
-let buttons = document.querySelectorAll('button');
+const questions=[
+    {
+        question:"Which is largest population country in the world ?",
+        answers:[
+            {text:"America", correct:false},
+            {text:"Russia", correct:false},
+            {text:"India", correct:true},
+            {text:"China", correct:false}
 
-let string = "";
-let arr = Array.from(buttons);
-arr.forEach(button => {
-    button.addEventListener('click', (e) =>{
-        if(e.target.innerHTML == '='){
-            string = eval(string);
-            input.value = string;
-        }
+        ]
+    },
 
-        else if(e.target.innerHTML == 'AC'){
-            string = "";
-            input.value = string;
+    {
+        question:"What is the strongest army in the world ?",
+        answers:[
+
+            {text:"India", correct:false},
+            {text:"USA", correct:true},
+            {text:"Russia", correct:false},
+            {text:"China", correct:false}
+
+        ]
+    },
+
+    {
+        question:"Which is the tallest building on the Earth ?",
+        answers:[
+            {text:"Burj Kalifa", correct:true},
+            {text:"Shanghai Tower", correct:false},
+            {text:"Merdeka", correct:false},
+            {text:"Lotte World Tower", correct:false}
+
+        ]
+    },
+
+    {
+        question:"Which is the smallest continent in the world ?",
+        answers:[
+            {text:"Asia", correct:false},
+            {text:"Australia", correct:true},
+            {text:"Arctic", correct:false},
+            {text:"Africa", correct:false}
+
+        ]
+    }
+
+];
+const questionElement=document.getElementById("question");
+const answerButtons=document.getElementById("answer-buttons");
+const nextButton=document.getElementById("btn-next")
+
+let currentQuestionIndex=0;
+let score=0;
+
+function startQuiz(){
+    currentQuestionIndex=0;
+    score=0;
+    nextButton.innerHTML = "Next";
+    showQuestion();
+}
+
+function showQuestion(){
+    resetState();
+    let currentQuestion=questions[currentQuestionIndex]
+    let questionNo=currentQuestionIndex + 1;
+    questionElement.innerHTML=questionNo + ". "+currentQuestion.question;
+
+    currentQuestion.answers.forEach(answer=>{
+        const button=document.createElement("button");
+        button.innerHTML=answer.text;
+        button.classList.add("btn");
+        answerButtons.appendChild(button);
+        if(answer.correct){
+            button.dataset.correct=answer.correct
         }
-        else if(e.target.innerHTML == 'DEL'){
-            string = string.substring(0, string.length-1);
-            input.value = string;
-        }
-        else{
-            string += e.target.innerHTML;
-            input.value = string;
-        }
-        
+        button.addEventListener("click", selectAnswer)
+
     })
+
+}
+function resetState(){
+    nextButton.style.display="none";
+    while(answerButtons.firstChild){
+        answerButtons.removeChild(answerButtons.firstChild)
+    }
+}
+
+
+
+function selectAnswer(e){
+    const selectedBtn= e.target;
+    const isCorrect=selectedBtn.dataset.correct === "true";
+    if(isCorrect){
+        selectedBtn.classList.add("correct");
+        score++;
+    }else{
+        selectedBtn.classList.add("incorrect");
+    }
+
+
+Array.from(answerButtons.children).forEach(button=>{
+    if(button.dataset.correct==="true"){
+        button.classList.add("correct")
+    }
+    button.disabled="true"
+
+    
+    });
+    nextButton.style.display="block"
+}
+
+
+function showScore(){
+    resetState();
+    questionElement.innerHTML=`you score ${score} out of ${questions.length}!`;
+    nextButton.innerHTML="Play Again";
+    nextButton.style.display="block";
+}
+
+function handleNextButton(){
+    currentQuestionIndex++;
+    if(currentQuestionIndex < questions.length){
+        showQuestion()
+    }else{
+        showScore()
+    }
+
+}
+
+
+nextButton.addEventListener("click", ()=>{
+    if(currentQuestionIndex < questions.length){
+        handleNextButton()
+    }else{
+        startQuiz()
+    }
 })
+startQuiz()
